@@ -1,0 +1,41 @@
+MindEaseV2/
+├── README.md
+├── docs/ (architecture and feature notes)
+├── database/
+│   ├── migrations/ (versioned SQL schema)
+│   └── seeds/ (development-only sample data)
+├── frontend/
+│   ├── public/ (static assets)
+│   └── src/
+│       ├── components/ (shared cards, buttons, dialogs, toast)
+│       ├── features/
+│       │   ├── auth/
+│       │   ├── tasks/
+│       │   ├── mood-chat/
+│       │   ├── mood-analysis/
+│       │   ├── recommendations/
+│       │   ├── meditation/
+│       │   ├── counselling/
+│       │   ├── face-scan/
+│       │   ├── journal/
+│       │   ├── history/
+│       │   └── settings/
+│       ├── lib/ (API client and helpers)
+│       ├── theme/ (shared light/dark themes)
+│       ├── types/
+│       ├── test/
+│       ├── App.tsx
+│       ├── main.tsx
+│       └── styles/index.css
+└── backend/
+    └── src/
+        ├── config/
+        ├── controllers/
+        ├── middleware/
+        ├── repositories/
+        ├── routes/
+        ├── services/
+        ├── types/
+        ├── validators/
+        ├── app.ts
+        └── server.ts
