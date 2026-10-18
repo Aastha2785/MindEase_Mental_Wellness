@@ -1,0 +1,117 @@
+.daily-page{--forest:#123b2d;--forest2:#1c4c39;--mint:#dff1d5;--cream:#fffaf0;--ink:#14352d;--muted:#668078;--card:#fffdf7;min-height:100vh;padding:22px clamp(16px,3vw,42px) 24px;background:radial-gradient(ellipse at 76% 0%,#d7eacb 0,transparent 27%),linear-gradient(135deg,#f4f4e7,#e5f0dd 50%,#f7efdc);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.daily-topbar{display:flex;align-items:center;gap:22px;max-width:1500px;margin:0 auto 22px}.daily-brand{display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none;min-width:200px}.brand-leaf{display:grid;place-items:center;width:43px;height:43px;border-radius:15px;background:#cfe8bf;color:#2b7652}.daily-brand b{display:block;font-size:20px;letter-spacing:-.5px}.daily-brand small{display:block;font-size:11px;color:var(--muted);margin-top:2px}.daily-top-message{display:flex;align-items:center;gap:10px;padding:9px 16px;border:1px solid #c6ddc3;background:#ffffff70;border-radius:22px;color:#416256;font-size:12px;line-height:1.45}.sun-mascot{font-size:26px}.daily-breath-pill{margin-left:auto;display:flex;align-items:center;gap:8px;border-radius:999px;padding:12px 18px;background:#e3edc0;color:#214a38;font-size:13px;font-weight:700}.daily-hero{max-width:1500px;margin:0 auto 22px;min-height:220px;display:grid;grid-template-columns:1.1fr .9fr;overflow:hidden;border-radius:28px;background:linear-gradient(110deg,#103b2b 0%,#1d5239 58%,#d9e9bd 58%,#f7eecb 100%);box-shadow:0 18px 45px #234d301b}.daily-hero-copy{padding:30px clamp(22px,3vw,44px);color:#f8fff5;position:relative;z-index:1}.daily-eyebrow{display:flex;align-items:center;gap:8px;color:#b7e2b9;font-size:10px;letter-spacing:2px;font-weight:800}.daily-eyebrow span{width:7px;height:7px;background:#a9e6a4;border-radius:50%;box-shadow:0 0 12px #9be69b}.daily-hero h1{font-size:clamp(30px,3vw,42px);letter-spacing:-1.5px;line-height:1.1;margin:12px 0}.title-leaf{font-size:.8em}.daily-hero-copy>p:not(.daily-eyebrow){color:#d3e9d7;margin:0;font-size:14px}.daily-date-picker{display:flex;align-items:center;gap:9px;background:#f8fff4;color:#214336;border-radius:14px;padding:8px 10px;width:max-content;max-width:100%;margin-top:23px;box-shadow:0 8px 22px #071f1630}.daily-date-picker strong{font-size:12px;white-space:nowrap}.daily-date-picker button{border:0;background:#eaf3e6;border-radius:8px;width:27px;height:27px;display:grid;place-items:center;color:#28553d;cursor:pointer}.daily-date-picker button:disabled{opacity:.35;cursor:not-allowed}.daily-date-picker input{width:18px;max-width:22px;opacity:.75;border:0;background:transparent;color:transparent;cursor:pointer}.daily-hero-art{position:relative;min-height:220px;overflow:hidden;background:radial-gradient(ellipse at 40% 40%,#fff8d9 0,#f5edc7 60%,#d6e7bd 100%)}.daily-hero-art:before{content:"";position:absolute;inset:auto 0 0;height:45px;background:#abc98e80;border-radius:50% 50% 0 0}.hero-girl{position:absolute;left:20%;bottom:20px;font-size:104px;filter:drop-shadow(0 8px 6px #3a5b3533);transform:rotate(-3deg)}.hero-cat{position:absolute;left:8%;bottom:20px;font-size:47px;filter:drop-shadow(0 5px 3px #3a5b3533)}.hero-sun{position:absolute;left:10%;top:18px;font-size:32px}.hero-plant{position:absolute;font-size:44px;filter:drop-shadow(0 4px 2px #48633a24)}.plant-one{left:1%;bottom:57px}.plant-two{right:4%;bottom:20px;font-size:55px}.hero-note{position:absolute;right:9%;top:42px;font-size:20px;font-weight:700;line-height:1.35;color:#294f3d;transform:rotate(3deg)}.hero-note span{color:#ee8b86}.floating-heart{position:absolute;color:#ed9c92;font-size:22px}.heart-one{left:43%;top:24px}.heart-two{left:55%;top:57px;color:#edc75f}.daily-grid{max-width:1500px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:18px}.daily-card{background:var(--card);border:1px solid #ffffffa8;border-radius:23px;padding:clamp(17px,2vw,25px);box-shadow:0 12px 32px #2e593213;min-width:0;overflow:hidden}.card-heading{display:flex;align-items:center;gap:12px;margin-bottom:18px}.card-heading h2{font-size:17px;letter-spacing:-.4px;margin:0;color:#193d32}.card-heading p{font-size:12px;color:#71877d;margin:4px 0 0}.heading-icon{width:43px;height:43px;border-radius:15px;display:grid;place-items:center;flex-shrink:0}.chart-icon{background:#e3edda;color:#2a6b4d}.leaf-icon{background:#d9edcf;color:#4b8c50}.sparkle-icon{background:#fff0c7;color:#d49b20}.bulb-icon{background:#fff0bf;font-size:21px}.tiny-flower{margin-left:auto;font-size:24px}.emotion-bars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding:5px 0 0}.emotion-column{display:flex;flex-direction:column;align-items:center;min-width:0}.emotion-percent{font-size:20px;letter-spacing:-.5px;margin-bottom:9px;color:#173d31}.emotion-track{position:relative;width:min(100%,84px);height:145px;border-radius:19px;background:#edf0e4;overflow:visible;display:flex;align-items:flex-end;justify-content:center}.emotion-fill{position:absolute;bottom:0;left:0;right:0;min-height:3px;border-radius:18px 18px 15px 15px;transition:height .5s ease}.emotion-face{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);width:45px;height:45px;display:grid;place-items:center;border:2px solid;border-radius:50%;font-size:25px;box-shadow:0 5px 10px #263b2918;background:#fff}.emotion-column>b{margin-top:20px;font-size:13px}.emotion-column>small{margin-top:4px;font-size:10px;color:#82938b;text-align:center;line-height:1.35}.analysis-source-note{margin-top:21px;border-top:1px solid #e9eee4;padding-top:13px;color:#6e867b;font-size:11px}.daily-data-note{font-size:11px;color:#71877d}.overall-card{background:linear-gradient(145deg,#e8f3dc,#f7f7e8 68%,#f4eacb)}.overall-content{display:flex;align-items:center;gap:18px;min-height:130px}.happy-mascot{position:relative;display:grid;place-items:center;flex:0 0 112px;height:112px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff5a4,#f7ca5c 68%,#e9ad44);font-size:63px;box-shadow:inset -8px -9px 0 #dca74135,0 9px 20px #c49c3b25}.happy-mascot span,.happy-mascot i{position:absolute;font-style:normal;color:#e8b83d;font-size:22px}.happy-mascot span{top:5px;right:5px}.happy-mascot i{left:2px;bottom:9px}.mood-tag{display:inline-block;padding:6px 10px;background:#fff0bb;color:#765a13;border-radius:999px;font-size:10px;font-weight:800}.overall-content h3{margin:9px 0 5px;font-size:20px;color:#234b38}.overall-content p{font-size:12px;line-height:1.6;color:#6b8173;margin:0}.metric-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}.metric-card{display:flex;align-items:center;gap:11px;min-width:0;padding:14px;border-radius:17px;background:#fffdf7;border:1px solid #e9eddf}.metric-mascot{font-size:29px;background:#e8f1e6;border-radius:13px;width:48px;height:48px;display:grid;place-items:center;flex-shrink:0}.metric-card>div{min-width:0;flex:1}.metric-card small{display:flex;align-items:center;gap:4px;font-size:10px;color:#6c8176;white-space:nowrap}.metric-card strong{display:block;font-size:23px;margin-top:4px;color:#214535}.metric-track{height:6px;background:#e9ecdf;border-radius:999px;overflow:hidden;margin-top:7px}.metric-track span{display:block;height:100%;border-radius:999px;background:#f3a151}.anxiety-metric .metric-track span{background:#67a9e7}.insight-card{position:relative;background:linear-gradient(120deg,#fffdf7,#f7f5e8)}.insight-body{position:relative;min-height:110px;padding:4px 95px 12px 2px}.insight-body p{font-size:14px;line-height:1.85;color:#46665a;margin:0;white-space:pre-line}.insight-quote{position:absolute;left:-2px;top:-20px;font-family:Georgia,serif;font-size:65px;color:#e7bd52;opacity:.5}.insight-body p{position:relative;padding-left:16px}.insight-girl{position:absolute;right:4px;bottom:0;font-size:62px;transform:rotate(-8deg)}.insight-girl span{position:absolute;right:-2px;top:-3px;font-size:22px}.insight-empty{display:flex;align-items:center;gap:14px;color:#658074;line-height:1.65;font-size:13px;min-height:92px}.hug-mascot{font-size:38px}.affirmation-strip{display:flex;align-items:center;gap:8px;margin-top:13px;padding:12px 14px;border-radius:14px;background:linear-gradient(100deg,#f9edce,#f6e5e6);color:#6a5d4e;font-size:11px;font-style:italic;line-height:1.5}.affirmation-strip span{margin-left:auto;font-style:normal;font-size:17px}.suggestions-card{background:#fffdf7}.suggestion-list{display:grid;gap:9px}.suggestion-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;text-decoration:none;color:inherit;background:#f8f6e9;border:1px solid transparent;transition:transform .18s,border-color .18s}.suggestion-item:hover{transform:translateY(-2px);border-color:#d6e6c9}.suggestion-item>span:nth-child(2){flex:1;min-width:0}.suggestion-item b{display:block;font-size:12px;color:#294b3c}.suggestion-item small{display:block;font-size:10px;color:#7b8b7e;margin-top:4px;line-height:1.5}.suggestion-item>svg{color:#537867;flex-shrink:0}.suggestion-art{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;flex-shrink:0;font-size:23px}.yellow-art{background:#fff0c8}.green-art{background:#e2efd9}.purple-art{background:#ece7ff;color:#8170da}.suggestion-disclaimer{font-size:10px;color:#8a9a8e;margin:13px 0 0}.daily-footer{max-width:1500px;margin:20px auto 0;display:flex;justify-content:center;align-items:center;gap:8px;text-align:center;color:#648274;font-size:12px}.daily-alert{max-width:1500px;margin:0 auto 18px;display:flex;align-items:center;gap:12px;padding:14px 17px;border:1px solid #f0c9b9;border-radius:16px;background:#fff2eb;color:#734c40}.daily-alert>span{font-size:25px}.daily-alert div{flex:1}.daily-alert b{font-size:13px}.daily-alert p{font-size:12px;margin:4px 0 0}.daily-alert button,.daily-primary-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:10px 14px;background:#226548;color:#fff;text-decoration:none;font-size:12px;font-weight:700;cursor:pointer}.daily-loading{min-height:210px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#648074;font-size:12px}.daily-loading.compact{min-height:110px}.spin{animation:daily-spin 1s linear infinite}@keyframes daily-spin{to{transform:rotate(360deg)}}.daily-empty{text-align:center;padding:8px 15px 15px}.empty-mascots{display:flex;justify-content:center;align-items:center;gap:16px;font-size:32px;margin:7px 0 12px}.empty-mascots span:nth-child(2){font-size:49px;filter:drop-shadow(0 5px 5px #536f4020)}.daily-empty h3{font-size:16px;color:#28503c;margin:0 0 7px}.daily-empty p,.mini-empty p{max-width:380px;margin:0 auto 15px;color:#71877c;font-size:12px;line-height:1.7}.mini-empty{text-align:center;padding:8px 10px 15px}.mini-empty>span{font-size:34px}.mini-empty p{margin-top:6px}.daily-primary-button{margin-bottom:4px}.daily-primary-button:hover{background:#174d35}
+@media(min-width:1200px){.mood-card{grid-row:span 1}.insight-card{min-height:225px}.suggestions-card{min-height:225px}}
+@media(max-width:900px){.daily-hero{grid-template-columns:1fr .75fr}.daily-hero-art{min-height:230px}.hero-girl{font-size:82px;left:15%}.hero-note{right:5%;font-size:16px}.daily-grid{grid-template-columns:1fr}.daily-top-message{display:none}.daily-hero{min-height:215px}.daily-card{padding:20px}}
+@media(max-width:560px){.daily-page{padding:14px 12px 20px}.daily-topbar{gap:8px;margin-bottom:14px}.daily-brand{min-width:0;flex:1}.daily-brand b{font-size:17px}.daily-brand small{font-size:10px}.brand-leaf{width:37px;height:37px}.daily-breath-pill{padding:10px;font-size:0;gap:0}.daily-breath-pill svg{width:18px;height:18px}.daily-hero{display:block;background:linear-gradient(135deg,#103b2b,#1e5239);border-radius:22px}.daily-hero-copy{padding:24px 18px 18px}.daily-hero h1{font-size:31px}.daily-hero-copy>p:not(.daily-eyebrow){font-size:12px}.daily-date-picker{margin-top:18px;gap:6px;padding:7px}.daily-date-picker strong{font-size:10px}.daily-hero-art{min-height:145px;border-top:1px solid #ffffff20}.hero-girl{font-size:70px;left:22%;bottom:8px}.hero-cat{font-size:34px;left:8%;bottom:7px}.hero-note{top:18px;right:12%;font-size:15px}.hero-sun{top:12px;font-size:25px}.plant-one{bottom:35px;font-size:31px}.plant-two{font-size:38px;bottom:5px}.daily-grid{gap:12px}.daily-card{padding:16px;border-radius:19px}.card-heading{gap:9px;margin-bottom:15px}.card-heading h2{font-size:15px}.card-heading p{font-size:11px}.heading-icon{width:38px;height:38px;border-radius:13px}.emotion-bars{gap:7px}.emotion-percent{font-size:16px}.emotion-track{height:118px;border-radius:15px}.emotion-face{width:36px;height:36px;font-size:20px}.emotion-column>b{font-size:11px;margin-top:17px}.emotion-column>small{font-size:9px}.overall-content{gap:12px}.happy-mascot{flex-basis:80px;height:80px;font-size:45px}.overall-content h3{font-size:17px}.overall-content p{font-size:11px}.metric-row{gap:8px}.metric-card{padding:10px;gap:7px;flex-direction:column;align-items:flex-start}.metric-mascot{width:38px;height:38px;font-size:23px}.metric-card small{font-size:9px}.metric-card strong{font-size:21px}.insight-body{padding-right:60px}.insight-body p{font-size:12px}.insight-girl{font-size:46px}.affirmation-strip{font-size:10px}.suggestion-item{gap:9px;padding:10px}.suggestion-item b{font-size:11px}.suggestion-item small{font-size:9px}.suggestion-art{width:36px;height:36px}.daily-alert{align-items:flex-start;flex-wrap:wrap}.daily-alert div{min-width:calc(100% - 55px)}.daily-alert button{margin-left:39px}.daily-footer{font-size:10px;line-height:1.5}}
+@media(prefers-reduced-motion:reduce){.daily-page *{animation:none!important;transition:none!important}}
+ 
+/* Fixed horizontal mood bars and mascot alignment */
+/* Vertical emoji bar chart for Daily Analysis */
+.daily-page .emoji-vertical-chart {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+  gap: clamp(10px, 2vw, 22px);
+  padding: 10px 0 4px;
+}
+
+.daily-page .emoji-vertical-chart .emoji-chart-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  gap: 9px;
+}
+
+.daily-page .vertical-bar-value {
+  color: var(--ink, #14352d);
+  font-size: clamp(16px, 1.6vw, 22px);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.daily-page .vertical-emoji-track {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: min(100%, 88px);
+  height: 150px;
+  overflow: visible;
+  border-radius: 18px;
+  background: #e9eee3;
+  box-shadow: inset 0 2px 5px #203d2b0d;
+}
+
+.daily-page .vertical-emoji-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: 3px;
+  border-radius: 16px 16px 15px 15px;
+  opacity: 0.9;
+  transition: height 0.55s ease;
+}
+
+.daily-page .vertical-emoji-face {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  transform: translateX(-50%);
+  border: 2px solid;
+  border-radius: 50%;
+  background: #fffdf7;
+  font-size: 23px;
+  box-shadow: 0 4px 10px #263b2918;
+}
+
+.daily-page .emoji-vertical-chart .emotion-column > b {
+  margin: 0;
+  font-size: 13px;
+  text-align: center;
+}
+
+.daily-page .emoji-vertical-chart .emotion-column > small {
+  margin: 0;
+  color: #82938b;
+  font-size: 10px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .daily-page .emoji-vertical-chart {
+    gap: 8px;
+  }
+
+  .daily-page .vertical-emoji-track {
+    height: 118px;
+    width: min(100%, 64px);
+    border-radius: 14px;
+  }
+
+  .daily-page .vertical-emoji-face {
+    width: 30px;
+    height: 30px;
+    bottom: 6px;
+    font-size: 18px;
+  }
+
+  .daily-page .vertical-bar-value {
+    font-size: 15px;
+  }
+
+  .daily-page .emoji-vertical-chart .emotion-column > b {
+    font-size: 11px;
+  }
+
+  .daily-page .emoji-vertical-chart .emotion-column > small {
+    font-size: 9px;
+    overflow-wrap: anywhere;
+  }
+}
