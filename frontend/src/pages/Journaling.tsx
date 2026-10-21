@@ -1,12 +1,10 @@
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   ArrowLeft,
   BookHeart,
   Brain,
-  CalendarDays,
   CheckCircle2,
-  Clock,
   Heart,
   LoaderCircle,
   NotebookPen,
@@ -31,17 +29,6 @@ type MoodAnalysis = {
   stressPercentage: number;
   anxietyPercentage: number;
   insight: string;
-};
-
-type Journal = {
-  journal_id: number;
-  journal_text: string;
-  overall_mood: string | null;
-  created_at: string;
-};
-
-type JournalListResponse = {
-  journals: Journal[];
 };
 
 type SaveResponse = {
@@ -99,19 +86,10 @@ function getToken() {
   return localStorage.getItem('mindease_token');
 }
 
-function formatDate(value: string) {
-  return new Date(value).toLocaleString([], {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
-}
-
 export default function Journaling() {
   const [text, setText] = useState('');
-  const [journals, setJournals] = useState<Journal[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [analysis, setAnalysis] = useState<MoodAnalysis | null>(null);
-  const [loadingHistory, setLoadingHistory] = useState(true);
   const [saving, setSaving] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState('');
@@ -121,38 +99,6 @@ export default function Journaling() {
   const wordCount = text.trim()
     ? text.trim().split(/\s+/).length
     : 0;
-
-  async function loadJournals() {
-    if (!token) {
-      setError('Please log in to access your private journal.');
-      setLoadingHistory(false);
-      return;
-    }
-
-    try {
-      const result = await apiRequest<JournalListResponse>(
-        '/api/journals',
-        'GET',
-        { token },
-      );
-
-      setJournals(result.journals);
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Unable to load your journal history.',
-      );
-    } finally {
-      setLoadingHistory(false);
-    }
-  }
-
-  useEffect(() => {
-    void loadJournals();
-    // Load once when this page opens.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   function startNewEntry() {
     setText('');
@@ -198,7 +144,6 @@ export default function Journaling() {
       setAnalysis(result.analysis);
       setNotice(result.message || 'Your journal has been saved! 💚');
 
-      await loadJournals();
     } catch (err) {
       setError(
         err instanceof Error
@@ -257,38 +202,6 @@ async function analyzeSelectedJournal() {
   }
 }
 
-  async function openJournal(journal: Journal) {
-    setError('');
-    setNotice('');
-    setAnalysis(null);
-
-    if (!token) {
-      setError('Please log in again to view your journal.');
-      return;
-    }
-
-    try {
-      const result = await apiRequest<{ journal: Journal }>(
-        `/api/journals/${journal.journal_id}`,
-        'GET',
-        { token },
-      );
-
-      setSelectedId(result.journal.journal_id);
-      setText(result.journal.journal_text);
-
-      setNotice(`Opened your journal from ${formatDate(journal.created_at)}.`);
-
-      // The history endpoint doesn't return the analysis. The user can
-      // request a fresh analysis with the button below.
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Unable to open this journal entry.',
-      );
-    }
-  }
 
   return (
     <section className="page-section journal-page">
@@ -567,103 +480,7 @@ async function analyzeSelectedJournal() {
           </article>
         </div>
 
-        <aside className="journal-sidebar-column">
-          <article className="card journal-history-card">
-            <div className="card-heading">
-              <div>
-                <span className="icon-tile amber">
-                  <Clock size={18} />
-                </span>
-                <h2>Past reflections 📚</h2>
-              </div>
 
-              <button
-                type="button"
-                className="journal-refresh-button"
-                onClick={() => void loadJournals()}
-                title="Refresh journal history"
-                aria-label="Refresh journal history"
-                disabled={loadingHistory}
-              >
-                <RefreshCw
-                  size={15}
-                  className={loadingHistory ? 'journal-spinner' : ''}
-                />
-              </button>
-            </div>
-
-            {loadingHistory ? (
-              <div className="journal-history-empty">
-                <LoaderCircle className="journal-spinner" size={20} />
-                <p>Loading your reflections…</p>
-              </div>
-            ) : journals.length === 0 ? (
-              <div className="journal-history-empty">
-                <span>📖</span>
-                <p>Your story starts here. Save your first journal!</p>
-              </div>
-            ) : (
-              <div className="journal-history-list">
-                {journals.map((journal) => (
-                  <button
-                    type="button"
-                    key={journal.journal_id}
-                    className={`journal-history-item ${
-                      selectedId === journal.journal_id
-                        ? 'journal-history-selected'
-                        : ''
-                    }`}
-                    onClick={() => void openJournal(journal)}
-                  >
-                    <span className="journal-history-icon">📝</span>
-
-                    <span className="journal-history-copy">
-                      <strong>
-                        {journal.journal_text.slice(0, 65)}
-                        {journal.journal_text.length > 65 ? '…' : ''}
-                      </strong>
-                      <small>
-                        <CalendarDays size={12} />
-                        {formatDate(journal.created_at)}
-                      </small>
-                      {journal.overall_mood && (
-                        <span className="journal-history-mood">
-                          🌿 {journal.overall_mood}
-                        </span>
-                      )}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <p className="journal-history-privacy">
-              🔒 Only you can access your journal entries.
-            </p>
-          </article>
-
-          <article className="card journal-kindness-card">
-            <span className="journal-kindness-emoji">🪴</span>
-            <h2>A reminder for you</h2>
-            <p>
-              You don't have to figure everything out today. One small
-              step, one deep breath, one honest moment at a time.
-            </p>
-            <span>Be kind to yourself. 💚</span>
-          </article>
-
-          <article className="card journal-privacy-card">
-            <span className="icon-tile mint">
-              <Heart size={17} />
-            </span>
-            <h2>Your thoughts are personal</h2>
-            <p>
-              Journal text is intended for your private reflection and
-              mood analysis. It should not be exposed in the admin
-              portal.
-            </p>
-          </article>
-        </aside>
       </div>
     </section>
   );

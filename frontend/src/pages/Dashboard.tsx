@@ -40,6 +40,14 @@ type TrendDay = {
   dominantEmotion: string | null;
 };
 
+type ApiTask = {
+  task_id: number;
+  task: string;
+  deadline: string;
+  is_completed: boolean;
+  created_at: string;
+};
+
 const featureCards = [
   { title: 'Journaling', description: 'Write your thoughts', to: '/journaling', icon: BookOpen, color: 'blue' },
   { title: 'Daily Mood Analysis', description: 'View today’s insight', to: '/daily-analysis', icon: Heart, color: 'purple' },
@@ -93,17 +101,79 @@ function clampPercentage(value: number | null | undefined) {
 }
 
 function cleanInsight(value: string | null | undefined) {
+  // Remove internal source markers such as [journal:9] before showing text to students.
   return (value ?? '')
-    .replace(/\\s*\\[(?:journal|chatbot):\\d+\\]/gi, '')
-    .replace(/\\s+/g, ' ')
+    .replace(/\s*\[(?:journal|chatbot):\d+\]/gi, '')
+    .replace(/\s+/g, ' ')
     .trim();
 }
+
+function getGreeting(date: Date) {
+  const hour = date.getHours();
+  if (hour >= 5 && hour < 12) return 'Good morning';
+  if (hour >= 12 && hour < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+
+const emotionPresentation: Record<string, { emoji: string; line: string }> = {
+  happy: { emoji: '😊', line: 'You seem to be feeling positive today. Notice what is going well and give yourself time to enjoy it.' },
+  sad: { emoji: '😔', line: 'You may be feeling low today. Be gentle with yourself and consider one small comforting step.' },
+  stressed: { emoji: '😟', line: 'You may be feeling under pressure. Pause, take a few slow breaths, and focus on one manageable next step.' },
+  angry: { emoji: '😠', line: 'You may be feeling frustrated. Give yourself a moment before responding and notice what you need right now.' },
+  unclear: { emoji: '💚', line: 'Your mood is not clear from the available entries yet. Check in with yourself and add a journal entry or chat when ready.' },
+};
 
 export default function Dashboard() {
   const [todayData, setTodayData] = useState<DailyAnalysisData | null>(null);
   const [trend, setTrend] = useState<TrendDay[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const [pendingTasks, setPendingTasks] = useState<ApiTask[]>([]);
+  const [tasksLoading, setTasksLoading] = useState(true);
+  const [tasksError, setTasksError] = useState('');
+  const [clockNow, setClockNow] = useState(Date.now());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setClockNow(Date.now()), 30000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadPendingTasks() {
+      const token = getToken();
+      if (!token) {
+        if (active) {
+          setPendingTasks([]);
+          setTasksError('Please log in again to view your tasks.');
+          setTasksLoading(false);
+        }
+        return;
+      }
+
+      try {
+        const result = await apiRequest<{ tasks: ApiTask[] }>('/api/tasks', 'GET', { token });
+        if (active) {
+          setPendingTasks(
+            (result.tasks ?? [])
+              .filter((task) => !task.is_completed)
+              .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime()),
+          );
+          setTasksError('');
+        }
+      } catch (error) {
+        if (active) {
+          setTasksError(error instanceof Error ? error.message : 'Unable to load your pending tasks.');
+        }
+      } finally {
+        if (active) setTasksLoading(false);
+      }
+    }
+
+    void loadPendingTasks();
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -191,7 +261,7 @@ export default function Dashboard() {
             <span className="eyebrow-dot" /> YOUR DAILY CHECK-IN
           </div>
           <h1>
-            Good morning! <span className="wave">✦</span>
+            {getGreeting(new Date(clockNow))}! <span className="wave">✦</span>
           </h1>
           <p>
             How are you feeling today? Write in your journal or talk to your AI
@@ -320,18 +390,27 @@ export default function Dashboard() {
 
           {loading ? (
             <p className="insight-copy">Loading your combined mood insight…</p>
-          ) : insight && hasTodayData ? (
-            <>
-              <p className="muted" style={{ marginBottom: 8 }}>
-                Today’s mood: {emotionLabels[dominant ?? ''] ?? dominant ?? 'Your feelings matter'}
-              </p>
-              <p className="insight-copy">{insight}</p>
-            </>
+          ) : hasTodayData && dominant ? (
+            <div style={{ display: 'grid', gridTemplateColumns: '72px minmax(0, 1fr)', alignItems: 'center', gap: 16, margin: '12px 0 18px' }}>
+              <div aria-label={`Mood: ${emotionLabels[dominant] ?? dominant}`} style={{ width: 72, height: 72, borderRadius: 22, display: 'grid', placeItems: 'center', background: 'var(--surface-secondary, #f1faf5)', fontSize: 46, lineHeight: 1 }}>
+                {emotionPresentation[dominant]?.emoji ?? '💚'}
+              </div>
+              <div>
+                <p style={{ fontWeight: 750, fontSize: 18, margin: '0 0 6px' }}>
+                  Feeling {emotionLabels[dominant] ?? dominant}
+                </p>
+                <p className="insight-copy" style={{ margin: 0 }}>
+                  {emotionPresentation[dominant]?.line ?? 'Take a moment to notice how you feel and what might help you today.'}
+                </p>
+              </div>
+            </div>
           ) : (
-            <p className="insight-copy">
-              Your insight will appear here when an eligible journal entry or
-              emotional chatbot disclosure is available.
-            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '12px 0 18px' }}>
+              <span aria-hidden="true" style={{ fontSize: 42 }}>💚</span>
+              <p className="insight-copy" style={{ margin: 0 }}>
+                Your mood insight will appear after a journal entry or emotional AI-chat analysis is saved.
+              </p>
+            </div>
           )}
 
           <Link className="text-link" to="/daily-analysis">
@@ -359,13 +438,92 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        <div className="task-preview">
-          <CheckCircle2 size={17} />
-          <span>
-            Your pending tasks will appear here when task management is
-            connected.
-          </span>
-        </div>
+        {tasksLoading ? (
+          <div className="task-preview">
+            <LoaderCircle size={17} className="animate-spin" />
+            <span>Loading your pending tasks…</span>
+          </div>
+        ) : tasksError ? (
+          <div className="task-preview" role="status">
+            <CheckCircle2 size={17} />
+            <span>{tasksError}</span>
+          </div>
+        ) : pendingTasks.length === 0 ? (
+          <div className="task-preview">
+            <CheckCircle2 size={17} />
+            <span>You’re all caught up! Add a task whenever you’re ready. 🌱</span>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gap: 12, marginTop: 16 }}>
+            <p className="muted" style={{ margin: 0, fontSize: 13 }}>
+              {pendingTasks.length} pending {pendingTasks.length === 1 ? 'task' : 'tasks'} · nearest deadline first
+            </p>
+            {pendingTasks.slice(0, 4).map((task) => {
+              const deadlineMs = new Date(task.deadline).getTime();
+              const createdMs = new Date(task.created_at).getTime();
+              const remainingMs = deadlineMs - clockNow;
+              const totalMs = Math.max(1, deadlineMs - (Number.isFinite(createdMs) ? createdMs : clockNow));
+              const timeLeftPercent = Math.max(0, Math.min(100, (remainingMs / totalMs) * 100));
+              const overdue = remainingMs <= 0;
+              const barColor = overdue || timeLeftPercent <= 10
+                ? '#ef4444'
+                : timeLeftPercent <= 25
+                  ? '#f97316'
+                  : timeLeftPercent <= 50
+                    ? '#eab308'
+                    : '#22c55e';
+              const moodEmoji = overdue || timeLeftPercent <= 10
+                ? '😰'
+                : timeLeftPercent <= 25
+                  ? '😟'
+                  : timeLeftPercent <= 50
+                    ? '😬'
+                    : '😊';
+              const timeLabel = overdue
+                ? 'Overdue — take a breath and choose your next step'
+                : remainingMs < 60 * 60 * 1000
+                  ? `${Math.max(1, Math.ceil(remainingMs / 60000))} min left`
+                  : remainingMs < 24 * 60 * 60 * 1000
+                    ? `${Math.floor(remainingMs / 3600000)}h ${Math.floor((remainingMs % 3600000) / 60000)}m left`
+                    : `${Math.floor(remainingMs / 86400000)}d ${Math.floor((remainingMs % 86400000) / 3600000)}h left`;
+
+              return (
+                <article
+                  key={task.task_id}
+                  style={{
+                    padding: 14,
+                    borderRadius: 16,
+                    border: '1px solid var(--border-color, #d1d5db)',
+                    background: 'var(--surface-secondary, rgba(128,128,128,0.06))',
+                    color: 'var(--text-primary, inherit)',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <strong style={{ display: 'block', overflowWrap: 'anywhere', fontSize: 14 }}>{task.task}</strong>
+                      <span className="muted" style={{ display: 'block', marginTop: 5, fontSize: 12 }}>
+                        Due {new Date(task.deadline).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                    <span aria-label={overdue ? 'Overdue' : 'Time remaining'} style={{ fontSize: 23, lineHeight: 1 }}>{moodEmoji}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center', marginTop: 12, marginBottom: 6, fontSize: 12 }}>
+                    <strong style={{ color: barColor }}>{timeLabel}</strong>
+                    <span className="muted">{Math.round(timeLeftPercent)}% time left</span>
+                  </div>
+                  <div role="progressbar" aria-label={`Time remaining for ${task.task}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(timeLeftPercent)} style={{ height: 8, borderRadius: 999, overflow: 'hidden', background: 'var(--border-color, #d1d5db)' }}>
+                    <div style={{ width: `${timeLeftPercent}%`, height: '100%', borderRadius: 999, background: barColor, transition: 'width 400ms ease, background 400ms ease' }} />
+                  </div>
+                </article>
+              );
+            })}
+            {pendingTasks.length > 4 && (
+              <p className="muted" style={{ margin: 0, fontSize: 12 }}>
+                +{pendingTasks.length - 4} more pending {pendingTasks.length - 4 === 1 ? 'task' : 'tasks'} — <Link className="text-link" to="/tasks">view all</Link>
+              </p>
+            )}
+          </div>
+        )}
       </section>
 
       <section className="feature-grid">

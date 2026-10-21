@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Activity, BarChart3, BookOpen, Camera, CheckSquare, Heart, History, Leaf, LogOut, Menu, MessageCircle, Moon, Settings, Sun, UserRound, Wind, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTheme } from '../theme/ThemeProvider';
 
 const navItems = [
@@ -20,7 +20,38 @@ export default function AppLayout() {
   const { theme, toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
-  const pageName = navItems.find(item => item.to === location.pathname)?.label ?? 'Dashboard';
+  const storedUser = (() => { try { return JSON.parse(localStorage.getItem('mindease_user') ?? 'null') as { role?: string; user_id?: number | string; userId?: number | string; id?: number | string } | null; } catch { return null; } })();
+  const studentId = storedUser?.user_id ?? storedUser?.userId ?? storedUser?.id;
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const readProfileImage = () => {
+      let currentUser: { user_id?: number | string; userId?: number | string; id?: number | string } | null = null;
+      try { currentUser = JSON.parse(localStorage.getItem('mindease_user') ?? 'null'); } catch { currentUser = null; }
+      const id = currentUser?.user_id ?? currentUser?.userId ?? currentUser?.id;
+      const keys = id == null
+        ? ['mindease_profile_picture', 'mindease_profile_image']
+        : [`mindEaseProfileImage_${id}`, `mindease_profile_image_${id}`, `mindease_profile_picture_${id}`, 'mindease_profile_picture', 'mindease_profile_image'];
+      let image: string | null = null;
+      for (const key of keys) {
+        const value = localStorage.getItem(key);
+        if (value && (value.startsWith('data:image/') || value.startsWith('https://') || value.startsWith('http://'))) { image = value; break; }
+      }
+      setProfileImage(image);
+    };
+    readProfileImage();
+    window.addEventListener('storage', readProfileImage);
+    window.addEventListener('mindEaseProfileUpdated', readProfileImage);
+    // Also refresh after a Settings page update in the same tab, even if it doesn't dispatch an event.
+    const refresh = window.setInterval(readProfileImage, 1000);
+    return () => {
+      window.removeEventListener('storage', readProfileImage);
+      window.removeEventListener('mindEaseProfileUpdated', readProfileImage);
+      window.clearInterval(refresh);
+    };
+  }, [studentId]);
+
+  const pageName = location.pathname === '/admin/counsellor-inbox' ? 'Counsellor Inbox' : (navItems.find(item => item.to === location.pathname)?.label ?? 'Dashboard');
 
   return (
     <div className={`app-shell theme-${theme}`}>
@@ -37,6 +68,7 @@ export default function AppLayout() {
               <Icon size={17} /><span>{label}</span>
             </NavLink>
           ))}
+          {storedUser?.role === 'admin' && <NavLink to="/admin/counsellor-inbox" onClick={() => setMenuOpen(false)} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}><Heart size={17} /><span>Counsellor Inbox</span></NavLink>}
         </nav>
         <div className="sidebar-bottom">
           <NavLink className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} to="/settings" onClick={() => setMenuOpen(false)}><Settings size={17} /><span>Settings & Privacy</span></NavLink>
@@ -53,7 +85,7 @@ export default function AppLayout() {
               {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
               <span>{theme === 'light' ? 'Emerald dark' : 'Colourful light'}</span>
             </button>
-            <NavLink className="top-icon-link" to="/profile" aria-label="Profile" title="Profile"><UserRound size={18} /><span>Profile</span></NavLink>
+            <NavLink className="top-icon-link" to="/profile" aria-label="Profile" title="Profile">{profileImage ? <img src={profileImage} alt="Profile" style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }} /> : <UserRound size={18} />}<span>Profile</span></NavLink>
             <NavLink className="top-icon-link" to="/settings" aria-label="Settings" title="Settings"><Settings size={18} /><span>Settings</span></NavLink>
           </div>
         </header>

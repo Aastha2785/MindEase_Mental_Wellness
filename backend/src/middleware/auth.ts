@@ -45,7 +45,8 @@ export function authenticateToken(
       typeof decoded === 'string' ||
       typeof decoded.userId !== 'number' ||
       !Number.isSafeInteger(decoded.userId) ||
-      decoded.userId <= 0 ||
+      decoded.userId < 0 ||
+      (decoded.userId === 0 && decoded.role !== 'admin') ||
       !['student', 'admin'].includes(decoded.role as string)
     ) {
       return res.status(401).json({

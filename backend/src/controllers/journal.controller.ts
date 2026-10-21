@@ -107,6 +107,7 @@ export async function analyzeJournalTextOnly(
   }
 }
 
+
 export async function createJournal(
   req: AuthRequest,
   res: Response,
@@ -132,52 +133,96 @@ export async function createJournal(
   const client = await pool.connect();
 
   try {
-    // Analyze before opening a transaction so we don't hold a database
-    // transaction open while waiting for the AI provider.
-    const analysis = await analyzeJournalText(journalText.trim());
+    const text = journalText.trim();
 
+    // Save the journal independently so a temporary AI failure
+    // cannot cause the student's writing to be lost.
     await client.query('BEGIN');
 
     const journalResult = await client.query(
       `INSERT INTO journals (user_id, journal_text)
        VALUES ($1, $2)
        RETURNING journal_id, created_at`,
-      [req.user.userId, journalText.trim()],
+      [req.user.userId, text],
     );
 
     const journal = journalResult.rows[0];
 
-    if (analysis.eligible) {
-      await saveMoodAnalysis(
-        client,
-        req.user.userId,
-        journal.journal_id,
-        analysis,
-      );
+    await client.query('COMMIT');
 
-      await client.query(
-        `UPDATE journals
-         SET overall_mood = $1
-         WHERE journal_id = $2 AND user_id = $3`,
-        [
-          analysis.dominantEmotion,
-          journal.journal_id,
-          req.user.userId,
-        ],
+    // Analyze after saving. Failure here must not delete the journal.
+    let analysis: JournalAnalysis | null = null;
+    let analysisError = false;
+
+    try {
+      analysis = await analyzeJournalText(text);
+    } catch (error) {
+      analysisError = true;
+
+      // Log the provider error, but never log the journal text or API key.
+      console.error(
+        'Journal mood analysis failed:',
+        error instanceof Error ? error.message : 'Unknown AI error',
       );
     }
 
-    await client.query('COMMIT');
+    // Save mood data only when a valid, eligible analysis was returned.
+    if (analysis?.eligible) {
+      const analysisClient = await pool.connect();
+
+      try {
+        await analysisClient.query('BEGIN');
+
+        await saveMoodAnalysis(
+          analysisClient,
+          req.user.userId,
+          journal.journal_id,
+          analysis,
+        );
+
+        await analysisClient.query(
+          `UPDATE journals
+           SET overall_mood = $1
+           WHERE journal_id = $2 AND user_id = $3`,
+          [
+            analysis.dominantEmotion,
+            journal.journal_id,
+            req.user.userId,
+          ],
+        );
+
+        await analysisClient.query('COMMIT');
+      } catch (error) {
+        try {
+          await analysisClient.query('ROLLBACK');
+        } catch (rollbackError) {
+          console.error('Mood analysis rollback failed:', rollbackError);
+        }
+
+        analysisError = true;
+
+        console.error(
+          'Saving journal mood analysis failed:',
+          error instanceof Error ? error.message : 'Unknown database error',
+        );
+
+        analysis = null;
+      } finally {
+        analysisClient.release();
+      }
+    }
 
     return res.status(201).json({
       journal: {
         journal_id: journal.journal_id,
         created_at: journal.created_at,
       },
-      analysis: analysis.eligible ? analysis : null,
-      message: analysis.eligible
-        ? 'Journal saved and mood analyzed.'
-        : 'Journal saved. There is not enough emotional information for a mood analysis.',
+      analysis: analysis?.eligible ? analysis : null,
+      message: analysisError
+        ? 'Journal saved successfully, but mood analysis is temporarily unavailable. You can analyze it again later.'
+        : analysis?.eligible
+          ? 'Journal saved and mood analyzed.'
+          : 'Journal saved. There is not enough emotional information for a mood analysis.',
     });
   } catch (error) {
     try {
@@ -191,8 +236,8 @@ export async function createJournal(
       error instanceof Error ? error.message : error,
     );
 
-    return res.status(502).json({
-      message: 'Unable to save and analyze the journal right now.',
+    return res.status(500).json({
+      message: 'Unable to save the journal right now. Please try again.',
     });
   } finally {
     client.release();

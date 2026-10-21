@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
+import { timingSafeEqual } from 'node:crypto';
 import { pool } from '../config/database.js';
 
 const signupSchema = z.object({
@@ -25,6 +26,13 @@ function createToken(userId: number, role: 'student' | 'admin') {
   return jwt.sign({ userId, role }, secret, { expiresIn: '1h' });
 }
 
+function safeEqual(a: string, b: string): boolean {
+  const left = Buffer.from(a, 'utf8');
+  const right = Buffer.from(b, 'utf8');
+
+  return left.length === right.length && timingSafeEqual(left, right);
+}
+
 export async function signup(req: Request, res: Response) {
   const parsed = signupSchema.safeParse(req.body);
 
@@ -40,20 +48,20 @@ export async function signup(req: Request, res: Response) {
   try {
     const result = await pool.query(
       `INSERT INTO users (username, password_hash, role)
-VALUES ($1, $2, 'student')
-RETURNING user_id, username, role`,
+       VALUES ($1, $2, 'student')
+       RETURNING user_id, username, role`,
       [username, passwordHash],
     );
 
     const user = result.rows[0];
-    const token = createToken(user.user_id, user.role);
+    const token = createToken(user.user_id, 'student');
 
     return res.status(201).json({
       message: 'Account created successfully',
       user: {
         userId: user.user_id,
         username: user.username,
-        role: user.role,
+        role: 'student',
       },
       token,
     });
@@ -61,9 +69,7 @@ RETURNING user_id, username, role`,
     const dbError = error as { code?: string };
 
     if (dbError.code === '23505') {
-      return res.status(409).json({
-        message: 'Username is already taken',
-      });
+      return res.status(409).json({ message: 'Username is already taken' });
     }
 
     console.error('Signup failed:', error);
@@ -78,21 +84,46 @@ export async function login(req: Request, res: Response) {
     return res.status(400).json({ message: 'Invalid username or password' });
   }
 
+  const { username, password } = parsed.data;
+
   try {
+    // V3 admin credentials are configured only in the backend environment.
+    const adminId = process.env.ADMIN_LOGIN_ID;
+    const adminPassword = process.env.ADMIN_LOGIN_PASSWORD;
+
+    if (adminId && adminPassword &&
+        safeEqual(username.toLowerCase(), adminId.toLowerCase()) &&
+        safeEqual(password, adminPassword)) {
+      const token = createToken(0, 'admin');
+
+      return res.json({
+        message: 'Admin login successful',
+        user: {
+          userId: 0,
+          username: adminId,
+          role: 'admin',
+        },
+        token,
+      });
+    }
+
+    // Existing database-backed user login remains unchanged.
     const result = await pool.query(
       `SELECT user_id, username, password_hash, role, account_status
        FROM users
        WHERE username = $1`,
-      [parsed.data.username],
+      [username],
     );
 
     const user = result.rows[0];
 
     if (
       !user ||
-      !(await bcrypt.compare(parsed.data.password, user.password_hash))
+      !(await bcrypt.compare(password, user.password_hash))
     ) {
-      return res.status(401).json({ message: 'Invalid username or password' });
+      return res.status(401).json({
+        message: 'Invalid username or password',
+      });
     }
 
     if (user.account_status !== 'active') {
@@ -100,7 +131,9 @@ export async function login(req: Request, res: Response) {
     }
 
     await pool.query(
-      'UPDATE users SET last_login_at = NOW(), last_active_at = NOW() WHERE user_id = $1',
+      `UPDATE users
+       SET last_login_at = NOW(), last_active_at = NOW()
+       WHERE user_id = $1`,
       [user.user_id],
     );
 

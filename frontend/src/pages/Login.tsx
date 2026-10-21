@@ -40,7 +40,7 @@ export default function Login() {
       localStorage.setItem('mindease_token', result.token);
       localStorage.setItem('mindease_user', JSON.stringify(result.user));
 
-      navigate('/', { replace: true });
+      navigate(result.user.role === 'admin' ? '/admin' : '/dashboard', { replace: true });
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Could not log in. Please try again.',

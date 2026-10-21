@@ -10,6 +10,12 @@ import databaseRoutes from './routes/database.routes.js';
 import moodAnalysisRoutes from './routes/mood-analysis.routes.js';
 import breathingRoutes from './routes/breathing.routes.js';
 
+import tasksRoutes from './routes/tasks.routes.js';
+import counsellingRoutes from './routes/counselling.routes.js';
+import adminRoutes from './routes/admin.routes.js';
+import historyRoutes from './routes/history.routes.js';
+import weeklyAnalysisRoutes from './routes/weekly-analysis.routes.js';
+
 const app = express();
 
 app.use(
@@ -22,9 +28,15 @@ app.use(
   }),
 );
 
+
+
 app.use(helmet());
 app.use(express.json({ limit: '1mb' }));
-
+app.use('/api/tasks', tasksRoutes);
+app.use('/api/counselling', counsellingRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/history', historyRoutes);
+app.use('/api/weekly-analysis', weeklyAnalysisRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
